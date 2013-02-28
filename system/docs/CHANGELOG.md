@@ -5,6 +5,9 @@ Version 3.1.beta1 (2013-03-XX)
 ------------------------------
 
 ### Changed
+Users can now log in with either their username or e-mail address.
+
+### Changed
 Added a "default" option to the login language select menu (see #5088).
 
 ### Improved

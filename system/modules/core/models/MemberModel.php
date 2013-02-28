@@ -35,7 +35,26 @@ class MemberModel extends \Model
 
 
 	/**
-	 * Find an active member by his/her e-mail-address and username
+	 * Find an active member by his/her username or e-mail address
+	 *
+	 * @param string $strValue   The username or password
+	 * @param array  $arrOptions An optional options array
+	 *
+	 * @return \Model|null The model or null if there is no member
+	 */
+	public static function findByUsernameOrPassword($strValue, array $arrOptions=array())
+	{
+		$time = time();
+		$t = static::$strTable;
+
+		$arrColumns = array("($t.username=? OR $t.email=?) AND $t.login=1 AND ($t.start='' OR $t.start<$time) AND ($t.stop='' OR $t.stop>$time) AND $t.disable=''");
+
+		return static::findOneBy($arrColumns, array($strValue, $strValue), $arrOptions);
+	}
+
+
+	/**
+	 * Find an active member by his/her e-mail address and username
 	 *
 	 * @param string $strEmail    The e-mail address
 	 * @param string $strUsername The username

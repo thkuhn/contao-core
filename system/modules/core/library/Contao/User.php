@@ -223,7 +223,7 @@ abstract class User extends \System
 		}
 
 		// Load the user object
-		if ($this->findBy('username', \Input::post('username', true)) == false)
+		if ($this->findByUsernameOrEmail(\Input::post('username', true)) == false)
 		{
 			$blnLoaded = false;
 
@@ -244,7 +244,7 @@ abstract class User extends \System
 			}
 
 			// Return if the user still cannot be loaded
-			if (!$blnLoaded || $this->findBy('username', \Input::post('username', true)) == false)
+			if (!$blnLoaded || $this->findByUsernameOrEmail(\Input::post('username', true)) == false)
 			{
 				\Message::addError($GLOBALS['TL_LANG']['ERR']['invalidLogin']);
 				$this->log('Could not find user "' . \Input::post('username', true) . '"', get_class($this) . ' login()', TL_ACCESS);
@@ -428,6 +428,29 @@ abstract class User extends \System
 		$objResult = $this->Database->prepare("SELECT * FROM " . $this->strTable . " WHERE " . $strColumn . "=?")
 									->limit(1)
 									->executeUncached($varValue);
+
+		if ($objResult->numRows > 0)
+		{
+			$this->arrData = $objResult->row();
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Find a user by his username or e-mail address
+	 *
+	 * @param mixed $strValue The username or e-mail address
+	 *
+	 * @return boolean True if the user was found
+	 */
+	public function findByUsernameOrEmail($strValue)
+	{
+		$objResult = $this->Database->prepare("SELECT * FROM " . $this->strTable . " WHERE username=? OR email=?")
+									->limit(1)
+									->executeUncached($strValue, $strValue);
 
 		if ($objResult->numRows > 0)
 		{
